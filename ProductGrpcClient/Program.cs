@@ -17,9 +17,9 @@ class Program
 
         var client = new ProductProtoService.ProductProtoServiceClient(channel);
 
-        //await GetProductAsync(client);
+/*        await GetProductAsync(client);
 
-        //await GetAllProducts(client);
+        await GetAllProducts(client);*/
 
         await AddProduct(client);
 
@@ -66,20 +66,20 @@ class Program
     {
         Console.WriteLine("Add Product started...");
 
-        var response = await client.AddProduct(new AddProductRequest
-        {
-            Product = new ProductModel()
+/*        var response = await client.AddProductAsync(
+            new AddProductRequest
             {
-                ProductId = 4,
-                Name = "Samsung Galaxy S23+",
-                Description = "Smart Phone",
-                Price = 1000.0F,
-                Status = ProductStatus.Instock,
-                CreatedTime = Timestamp.FromDateTime(DateTime.UtcNow)
-            }
-        });
+                Product = new ProductModel
+                {
+                    Name = "Red",
+                    Description = "New Red Phone Mi10T",
+                    Price = 699,
+                    Status = ProductStatus.Instock,
+                    CreatedTime = Timestamp.FromDateTime(DateTime.UtcNow)
+                }
+            });
 
-        Console.WriteLine("ProductModel: " + response.ToString());
+        Console.WriteLine("ProductModel: " + response.ToString());*/
 
         //await GetAllProducts(client);
 
