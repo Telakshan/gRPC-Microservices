@@ -2,6 +2,7 @@
 using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
 using ProductGrpc.Data;
+using ProductGrpc.Models;
 using ProductGrpc.Protos;
 
 namespace ProductGrpc.Services;
@@ -70,6 +71,33 @@ public class ProductService: ProductProtoService.ProductProtoServiceBase
 
             await responseStream.WriteAsync(productModel);
         }
+
+    }
+
+    public override async Task<ProductModel> AddProduct(AddProductRequest request, ServerCallContext context)
+    {
+        var product = new Product
+        {
+            ProductId = request.Product.ProductId,
+            Name = request.Product.Name,
+            Description = request.Product.Description,
+            Price = request.Product.Price,
+            Status = Product.ProductStatus.INSTOCK,
+            CreatedTime = DateTime.Now
+        };
+
+        await _productsContext.Product.AddAsync(product);
+        await _productsContext.SaveChangesAsync();
+
+        return new ProductModel
+        {
+            ProductId = product.ProductId,
+            Name = product.Name,
+            Description = product.Description,
+            Price = product.Price,
+            Status = ProductStatus.Instock,
+            CreatedTime = Timestamp.FromDateTime(product.CreatedTime)
+        };
 
     }
 

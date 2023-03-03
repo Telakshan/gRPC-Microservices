@@ -1,6 +1,7 @@
-﻿using Grpc.Net.Client;
+﻿using Google.Protobuf.WellKnownTypes;
+using Grpc.Core;
+using Grpc.Net.Client;
 using ProductGrpc.Protos;
-using System.ComponentModel.DataAnnotations;
 
 namespace ProductGrpcClient;
 
@@ -16,26 +17,74 @@ class Program
 
         var client = new ProductProtoService.ProductProtoServiceClient(channel);
 
+        //await GetProductAsync(client);
+
+        //await GetAllProducts(client);
+
+        await AddProduct(client);
+
+        //using (var clientData = client.GetAllProducts(new GetAllProductsRequest()))
+        //{
+        //    while (await clientData.ResponseStream.MoveNext(new CancellationToken()))
+        //    {
+        //        var currentProduct = clientData.ResponseStream.Current;
+        //        Console.WriteLine(currentProduct);
+        //    }
+        //}
+
+    }
+
+    private static async Task GetAllProducts(ProductProtoService.ProductProtoServiceClient client)
+    {
+        Console.WriteLine("\nGetAllProducts foreach...");
+
+        using var clientData = client.GetAllProducts(new GetAllProductsRequest());
+
+        await foreach (var responseData in clientData.ResponseStream.ReadAllAsync())
+        {
+            Console.WriteLine(responseData);
+        }
+
+        Console.ReadLine();
+
+    }
+
+    private static async Task GetProductAsync(ProductProtoService.ProductProtoServiceClient client)
+    {
+        Console.WriteLine("GetProductAsync started...");
 
         var response = await client.GetProductAsync(new GetProductRequest
         {
             ProductId = 2
-        }); 
+        });
+
+        Console.WriteLine("ProductModel: " + response.ToString());
+    }
+
+
+    private static async Task AddProduct(ProductProtoService.ProductProtoServiceClient client)
+    {
+        Console.WriteLine("Add Product started...");
+
+        var response = await client.AddProduct(new AddProductRequest
+        {
+            Product = new ProductModel()
+            {
+                ProductId = 4,
+                Name = "Samsung Galaxy S23+",
+                Description = "Smart Phone",
+                Price = 1000.0F,
+                Status = ProductStatus.Instock,
+                CreatedTime = Timestamp.FromDateTime(DateTime.UtcNow)
+            }
+        });
 
         Console.WriteLine("ProductModel: " + response.ToString());
 
-        Console.WriteLine("\nGetAllProductsAsync...");
+        //await GetAllProducts(client);
 
-
-        using (var clientData = client.GetAllProducts(new GetAllProductsRequest()))
-        {
-            while (await clientData.ResponseStream.MoveNext(new System.Threading.CancellationToken()))
-            {
-                var currentProduct = clientData.ResponseStream.Current;
-                Console.WriteLine(currentProduct);
-            }
-        }
-
-        Console.ReadLine();
     }
+
+
+
 }
