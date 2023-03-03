@@ -5,8 +5,9 @@ using ProductGrpc.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddGrpc();
+builder.Services.AddGrpc(opt => opt.EnableDetailedErrors = true);
 builder.Services.AddDbContext<ProductsContext>(options => options.UseInMemoryDatabase("Products"));
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
 

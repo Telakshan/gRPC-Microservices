@@ -33,7 +33,7 @@ message UpdateProductRequest {
 }
 
 message DeleteProductRequest {
-	int32 product = 1;
+	int32 productId = 1;
 }
 
 message DeleteProductResponse {
