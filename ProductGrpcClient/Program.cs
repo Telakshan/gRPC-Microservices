@@ -17,17 +17,17 @@ class Program
 
         var client = new ProductProtoService.ProductProtoServiceClient(channel);
 
-        await GetProductAsync(client);
+        //await GetProductAsync(client);
 
         //await AddProductAsync(client);
 
-        await UpdateProductAsync(client);
+        //await UpdateProductAsync(client);
 
-        await GetAllProducts(client);
+        //await GetAllProducts(client);
 
-        await InsertBulkProductAsync(client);
+        //await InsertBulkProductAsync(client);
 
-        await DeleteProductAsync(client);
+        //await DeleteProductAsync(client);
 
         Console.ReadLine();
 
