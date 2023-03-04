@@ -18,8 +18,8 @@ public class ProductService: ProductProtoService.ProductProtoServiceBase
     public ProductService(ProductsContext productsContext, IMapper mapper, ILogger<ProductService> logger)
     {
         _productsContext = productsContext;
-        _logger = logger;
         _mapper = mapper;
+        _logger = logger;
     }
 
     public override Task<Empty> Test(Empty request, ServerCallContext context)
