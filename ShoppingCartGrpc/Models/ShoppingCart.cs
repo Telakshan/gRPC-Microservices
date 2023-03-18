@@ -15,17 +15,7 @@ public class ShoppingCart
         UserName = userName;
     }
 
-    public float TotalPrice
-    {
-        get
-        {
-            float totalprice = 0;
-            foreach (var item in Items)
-            {
-                totalprice += item.Price * item.Quantity;
-            }
-            return totalprice;
-        }
-    }
+    public float TotalPrice => Items.Select(x => x.Price * x.Quantity).Sum();
+    
 }
 
