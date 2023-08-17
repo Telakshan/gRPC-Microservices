@@ -6,7 +6,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddGrpc(opt => opt.EnableDetailedErrors = true);
-builder.Services.AddDbContext<ProductsContext>(options => options.UseInMemoryDatabase("Products"));
+//builder.Services.AddDbContext<ProductsContext>(options => options.UseInMemoryDatabase("Products"));
+builder.Services.AddDbContext<ProductsContext>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
@@ -15,9 +16,9 @@ var app = builder.Build();
 app.MapGrpcService<ProductService>();
 app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
-SeedDatabase();
+//SeedDatabase();
 
-void SeedDatabase()
+/*void SeedDatabase()
 {
     using var scope = app.Services.CreateScope();
         
@@ -30,11 +31,11 @@ void SeedDatabase()
         {
             throw;
         }
-}
+}*/
 
 app.Run();
 
-public static class Seeder
+/*public static class Seeder
 {
     public static void Initialize(ProductsContext context)
     {
@@ -42,4 +43,4 @@ public static class Seeder
         ProductsContextSeed.SeedAsync(context);
         context.SaveChanges();
     }
-}
+}*/

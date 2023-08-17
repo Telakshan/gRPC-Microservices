@@ -23,7 +23,7 @@ class Program
 
         //await UpdateProductAsync(client);
 
-        //await GetAllProducts(client);
+        await GetAllProducts(client);
 
         //await InsertBulkProductAsync(client);
 
