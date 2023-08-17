@@ -7,7 +7,7 @@ public class ProductsContextSeed
 {
     public static void SeedAsync(ProductsContext productsContext)
     {
-        if (!productsContext.Product.Any())
+        if (!productsContext.Products.Any())
         {
             var products = new List<Product>
                 {
@@ -39,7 +39,7 @@ public class ProductsContextSeed
                         CreatedTime = DateTime.UtcNow
                     }
                 };
-            productsContext.Product.AddRange(products);
+            productsContext.Products.AddRange(products);
             productsContext.SaveChanges();
         }
     }
