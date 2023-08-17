@@ -23,11 +23,13 @@ class Program
 
         //await UpdateProductAsync(client);
 
+        //await DeleteProductAsync(client);
+
+        await InsertBulkProductAsync(client);
+
         await GetAllProducts(client);
 
-        //await InsertBulkProductAsync(client);
 
-        //await DeleteProductAsync(client);
 
         Console.ReadLine();
 
@@ -52,6 +54,8 @@ class Program
         {
             Console.WriteLine(responseData);
         }
+
+        clientData.Dispose();
 
     }
 
@@ -93,15 +97,26 @@ class Program
     {
         Console.WriteLine("\nDelete Product started...");
 
+        List<int> nums = new List<int> { 5, 6, 7 };
+
         var response = await client.DeleteProductAsync(
             new DeleteProductRequest
             {
                 ProductId = 5
             });
 
-        Console.WriteLine("DeleteProductResponse: " + response.ToString());
+        /*        foreach (var num in nums)
+                {
+                    var response = await client.DeleteProductAsync(
+                            new DeleteProductRequest
+                            {
+                                ProductId = num
+                            });*/
 
+        Console.WriteLine("DeleteProductResponse: " + response.ToString());
+        
     }
+
 
     private static async Task UpdateProductAsync(ProductProtoService.ProductProtoServiceClient client)
     {
@@ -134,8 +149,8 @@ class Program
         {
             var productModel = new ProductModel
             {
-                Name = $"Product{i}",
-                Description = "Bulk inserted product",
+                Name = $"{GenerateRandomStrings(5)}{i}",
+                Description = GenerateRandomStrings(18),
                 Price = 399,
                 Status = ProductStatus.Instock,
                 CreatedTime = Timestamp.FromDateTime(DateTime.UtcNow)
@@ -147,6 +162,15 @@ class Program
         await clientBulk.RequestStream.CompleteAsync();
         var responseBulk = await clientBulk;
         Console.WriteLine($"Status: {responseBulk.Success}. Insert Count: {responseBulk.InsertCount}");
+    }
+
+    public static string GenerateRandomStrings(int length)
+    {
+        Random random = new Random();
+        string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+        return (new string(Enumerable.Repeat(chars, length)
+              .Select(s => s[random.Next(s.Length)]).ToArray()));
     }
 
 }
