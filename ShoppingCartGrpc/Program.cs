@@ -28,7 +28,7 @@ void SeedDatabase()
     {
         var scopedContext = scope.ServiceProvider.GetRequiredService<ShoppingCartContext>();
         Seeder.Initialize(scopedContext);
-    }
+    } 
     catch
     {
         throw;

@@ -15,6 +15,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ShoppingCart", "ShoppingCar
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShoppingCartGrpc", "ShoppingCartGrpc\ShoppingCartGrpc.csproj", "{C3957552-E2A7-4606-BB72-49070446A98F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Discount", "Discount", "{9AD4F8A6-1844-4757-9CC4-E8F2D1CCECA2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscountGrpc", "DiscountGrpc\DiscountGrpc.csproj", "{30D5F1A5-809A-4FCD-A717-478BFD521B25}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +41,10 @@ Global
 		{C3957552-E2A7-4606-BB72-49070446A98F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C3957552-E2A7-4606-BB72-49070446A98F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C3957552-E2A7-4606-BB72-49070446A98F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30D5F1A5-809A-4FCD-A717-478BFD521B25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30D5F1A5-809A-4FCD-A717-478BFD521B25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30D5F1A5-809A-4FCD-A717-478BFD521B25}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30D5F1A5-809A-4FCD-A717-478BFD521B25}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -46,6 +54,7 @@ Global
 		{BF60A336-F441-4389-9F98-46784C8C75B6} = {094D5342-B9BD-41D7-81E7-00394CB4F035}
 		{DD9EA606-3E12-4D77-954E-41AAE29143ED} = {094D5342-B9BD-41D7-81E7-00394CB4F035}
 		{C3957552-E2A7-4606-BB72-49070446A98F} = {084D928C-9E51-49F3-9716-DA557D85B5A2}
+		{30D5F1A5-809A-4FCD-A717-478BFD521B25} = {9AD4F8A6-1844-4757-9CC4-E8F2D1CCECA2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CD1BE863-3FF4-4074-AC25-0401D6197A36}
