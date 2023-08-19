@@ -87,6 +87,9 @@ public class ShoppingCartService: ShoppingCartProtoService.ShoppingCartProtoServ
         }
 
         shoppingCart.Items.Remove(itemToBeRemoved);
+
+        _logger.LogInformation($"ShoppingCartitem removed: {itemToBeRemoved.Id}");
+
         var removeCount = await _shoppingCartContext.SaveChangesAsync();
 
         return new RemoveItemIntoShoppingCartResponse
@@ -105,7 +108,7 @@ public class ShoppingCartService: ShoppingCartProtoService.ShoppingCartProtoServ
         if (cartExists)
         {
             _logger.LogError("Invalid UserName for ShoppingCart creation. UserName : {userName}", shoppingCart.UserName);
-            throw new RpcException(new Status(StatusCode.NotFound, $"ShoppingCart with UserName={request.Username} is already exist."));
+            throw new RpcException(new Status(StatusCode.NotFound, $"ShoppingCart with UserName={request.Username} already exist."));
         }
 
         _shoppingCartContext.ShoppingCart.Add(shoppingCart);
