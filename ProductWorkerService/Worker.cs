@@ -34,17 +34,6 @@ namespace ProductWorkerService
                 await Task.Delay(_configuration.GetValue<int>("WorkerService:TaskInterval"), stoppingToken);
             }
         }
-
-        public string GenerateRandomStrings(int length)
-        {
-            Random random = new Random();
-            string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
-            return (new string(Enumerable.Repeat(chars, length)
-                  .Select(s => s[random.Next(s.Length)]).ToArray()));
-        }
-
-
     }
 
 }

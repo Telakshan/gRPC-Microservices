@@ -1,14 +1,20 @@
 using ShoppingCartGrpc.Data;
 using Microsoft.EntityFrameworkCore;
 using ShoppingCartGrpc.Services;
+using DiscountGrpc.Protos;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Additional configuration is required to successfully run gRPC on macOS.
 // For instructions on how to configure Kestrel and gRPC clients on macOS, visit https://go.microsoft.com/fwlink/?linkid=2099682
 
-// Add services to the container.
+//configuration
+IConfiguration configuration = builder.Configuration;
+
+//Add services to the container.
 builder.Services.AddGrpc();
+builder.Services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>(o => o.Address = new Uri(configuration.GetValue<string>("GrpcConfigs:DiscountUrl")));
+builder.Services.AddScoped<DiscountService>();
 builder.Services.AddDbContext<ShoppingCartContext>(options => options.UseInMemoryDatabase("ShoppingCart"));
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
@@ -46,3 +52,8 @@ public static class Seeder
         context.SaveChanges();
     }
 }
+
+//gRPC only works with https protocol
+//ProductServer 7212
+//DiscountServer 7169
+//ShoppingCartServer 7093
