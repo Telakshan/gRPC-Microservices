@@ -2,6 +2,7 @@
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using ProductGrpc.Data;
 using ProductGrpc.Models;
 using ProductGrpc.Protos;
@@ -53,12 +54,12 @@ public class ProductService: ProductProtoService.ProductProtoServiceBase
 
         foreach (var product in productList)
         {
-
-
             var productModel = _mapper.Map<ProductModel>(product);
 
             await responseStream.WriteAsync(productModel);
         }
+
+        _logger.LogInformation("GetAllProducts called. Items returned: {count}", productList.Count);
 
     }
 

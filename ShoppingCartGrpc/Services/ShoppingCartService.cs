@@ -56,8 +56,14 @@ public class ShoppingCartService: ShoppingCartProtoService.ShoppingCartProtoServ
             }
             else
             {
+                _logger.LogInformation("GetDiscountStarted...");
+
                 var discount = await _discountService.GetDiscount(requestStream.Current.DiscountCode);
+                
+                _logger.LogInformation($"DiscountModel returned: {discount}");
+                
                 newAddedCartItem.Price -= discount.Amount;
+                
                 shoppingCart.Items.Add(newAddedCartItem);
             }
         }

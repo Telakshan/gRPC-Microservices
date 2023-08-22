@@ -33,6 +33,30 @@ app.MapGet("/", () => "Communication with gRPC endpoints must be made through a 
         }
 }*/
 
+TruncateTable();
+
+async void TruncateTable()
+{
+    using var scope = app.Services.CreateScope();
+
+    try
+    {
+        var scopedContext = scope.ServiceProvider.GetRequiredService<ProductsContext>();
+
+        var length = await scopedContext.Products.CountAsync();
+
+        var itemsToDelete =  scopedContext.Products.Where(x => x.ProductId > 7);
+
+        scopedContext.Products.RemoveRange(itemsToDelete);
+
+        scopedContext.SaveChanges();
+
+    }catch (Exception) 
+    { 
+        throw;
+    }
+}
+
 app.Run();
 
 /*public static class Seeder

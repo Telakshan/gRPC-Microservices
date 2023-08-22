@@ -5,7 +5,7 @@ namespace DiscountGrpc.Data;
 
 public class DiscountContext: DbContext
 {
-    public DbSet<Discount> Discounts { get; set; }
+    public DbSet<Discount> Discount { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -25,7 +25,7 @@ public class DiscountContext: DbContext
             new Discount{ DiscountId = 2, Code = "CODE_200", Amount = 200 },
             new Discount{ DiscountId = 3, Code = "CODE_300", Amount = 300 }
         };
-
+        
         modelBuilder.Entity<Discount>().HasData( Discounts );
 
     }

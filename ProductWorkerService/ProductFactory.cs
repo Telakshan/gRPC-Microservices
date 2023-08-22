@@ -1,4 +1,7 @@
-﻿namespace ProductWorkerService;
+﻿using Google.Protobuf.WellKnownTypes;
+using ProductGrpc.Protos;
+
+namespace ProductWorkerService;
 
 public class ProductFactory
 {

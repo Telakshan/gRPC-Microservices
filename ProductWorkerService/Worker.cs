@@ -20,9 +20,11 @@ namespace ProductWorkerService
         {
             while (!stoppingToken.IsCancellationRequested)
             {
+                //await Task.Delay(3000);
+
                 _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
 
-                using var channel = GrpcChannel.ForAddress(_configuration.GetValue<string>("WorkerService:ServerUrl"));
+                using var channel = GrpcChannel.ForAddress(_configuration.GetValue<string>("WorkerService:ServerUrl") ?? throw new ArgumentNullException("ProductServerUrl Not found!"));
                 var client = new ProductProtoService.ProductProtoServiceClient(channel);
 
                 _logger.LogInformation("AddProduct started...");

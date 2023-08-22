@@ -2,6 +2,7 @@
 using DiscountGrpc.Data;
 using DiscountGrpc.Protos;
 using Grpc.Core;
+using Microsoft.EntityFrameworkCore;
 
 namespace DiscountGrpc.Services;
 
@@ -20,7 +21,7 @@ public class DiscountService : DiscountProtoService.DiscountProtoServiceBase
 
     public override async Task<DiscountModel> GetDiscount(GetDiscountRequest request, ServerCallContext context)
     {
-        var discount = await _discountContext.Discounts.FindAsync(request.DiscountCode);
+        var discount = await _discountContext.Discount.FirstOrDefaultAsync(x => x.Code == request.DiscountCode);
 
         _logger.LogInformation("Discount code: {discountCode}; Amount: {discountAmount}", discount?.Code, discount?.Amount);
 

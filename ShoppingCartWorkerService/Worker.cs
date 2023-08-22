@@ -20,6 +20,8 @@ public class Worker : BackgroundService
     {
         while (!stoppingToken.IsCancellationRequested)
         {
+            //await Task.Delay(5000);
+
             _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
 
             using var shoppingCartChannel = GrpcChannel
@@ -30,11 +32,11 @@ public class Worker : BackgroundService
             //Get or create a shopping cart
             var shoppingCartModel = await GetOrCreateShoppingCart(shoppingCartClient);
 
-            //Open client stream
+           //Open client stream
             using var scClientStream = shoppingCartClient.AddItemIntoShoppingCart();
 
             //ProductGrpc channel
-            using var productChannel = GrpcChannel.ForAddress(_configuration.GetValue<string>("WorkerService:ProductServiceUrl") ?? throw new ArgumentNullException("ProductServerUrl Not found!"));
+            using var productChannel = GrpcChannel.ForAddress(_configuration.GetValue<string>("WorkerService:ProductServerUrl") ?? throw new ArgumentNullException("ProductServerUrl Not found!"));
 
             //ProductGrpc client
             var productClient = new ProductProtoService.ProductProtoServiceClient(productChannel);
@@ -72,9 +74,9 @@ public class Worker : BackgroundService
             //Close the stream
             await scClientStream.RequestStream.CompleteAsync();
 
-            var addItemIntoShoppingCartResponse = await scClientStream;
+            //var addItemIntoShoppingCartResponse = await scClientStream;
 
-            _logger.LogInformation("AddItemIntoShoppingCartResponse: {addItemIntoShoppingCartResponse}", addItemIntoShoppingCartResponse);
+            _logger.LogInformation("AddItemIntoShoppingCartResponse: {addItemIntoShoppingCartResponse}", scClientStream);
 
             await Task.Delay(_configuration.GetValue<int>("WorkerService:TaskInterval"), stoppingToken);
         }
