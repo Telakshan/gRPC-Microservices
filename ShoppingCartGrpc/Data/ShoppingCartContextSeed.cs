@@ -13,7 +13,7 @@ public class ShoppingCartContextSeed
                     new ShoppingCart
                     {
                         UserName = "swn",
-                        Items = new List<ShoppingCartItem>
+                        ShoppingCartItems = new List<ShoppingCartItem>
                         {
                            new ShoppingCartItem
                            {

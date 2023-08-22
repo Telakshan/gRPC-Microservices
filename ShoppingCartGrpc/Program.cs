@@ -28,7 +28,7 @@ var app = builder.Build();
 app.MapGrpcService<ShoppingCartService>();
 app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
-TruncateTable();
+//TruncateTable();
 
 app.Run();
 
@@ -44,11 +44,11 @@ async void TruncateTable()
 
         var length = await scopedContext.ShoppingCart.CountAsync();
 
-        if (length == 100)
+        if (length > 100)
         {
             //var itemsToDelete = _productsContext.Products.Where(x => x.ProductId > 184);
 
-            var itemsToDelete = scopedContext.ShoppingCart.Take(100);
+            var itemsToDelete = scopedContext.ShoppingCart.Take(1000);
 
             //var itemsToDelete = new List<Product>();
 

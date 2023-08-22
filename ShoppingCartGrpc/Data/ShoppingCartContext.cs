@@ -14,7 +14,7 @@ public class ShoppingCartContext : DbContext
     }
 
     public DbSet<ShoppingCart> ShoppingCart { get; set; }
-    //public DbSet<ShoppingCartItem> ShoppingCartItem { get; set; }
+    public DbSet<ShoppingCartItem> ShoppingCartItem { get; set; }
 
 }
 

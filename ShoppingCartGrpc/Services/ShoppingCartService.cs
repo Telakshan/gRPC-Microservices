@@ -48,7 +48,7 @@ public class ShoppingCartService: ShoppingCartProtoService.ShoppingCartProtoServ
             }
 
             var newAddedCartItem = _mapper.Map<ShoppingCartItem>(requestStream.Current.NewCartItem);
-            var cartItem = shoppingCart.Items.FirstOrDefault(i => i.ProductId == newAddedCartItem.ProductId);  
+            var cartItem = shoppingCart.ShoppingCartItems.FirstOrDefault(i => i.ProductId == newAddedCartItem.ProductId);  
             
             if(cartItem != null)
             {
@@ -64,7 +64,7 @@ public class ShoppingCartService: ShoppingCartProtoService.ShoppingCartProtoServ
                 
                 newAddedCartItem.Price -= discount.Amount;
                 
-                shoppingCart.Items.Add(newAddedCartItem);
+                shoppingCart.ShoppingCartItems.Add(newAddedCartItem);
             }
         }
 
@@ -88,16 +88,16 @@ public class ShoppingCartService: ShoppingCartProtoService.ShoppingCartProtoServ
             throw new RpcException(new Status(StatusCode.NotFound, $"ShoppingCart with UserName={request.Username} is not found."));
         }
 
-        var itemToBeRemoved = shoppingCart.Items.FirstOrDefault(i => i.ProductId == request.RemoveCartItem.ProductId);
+        var itemToBeRemoved = shoppingCart.ShoppingCartItems.FirstOrDefault(i => i.ProductId == request.RemoveCartItem.ProductId);
 
         if (itemToBeRemoved == null)
         {
             throw new RpcException(new Status(StatusCode.NotFound, $"CartItem with ProductId={request.RemoveCartItem.ProductId} is not found in the ShoppingCart."));
         }
 
-        shoppingCart.Items.Remove(itemToBeRemoved);
+        shoppingCart.ShoppingCartItems.Remove(itemToBeRemoved);
 
-        _logger.LogInformation($"ShoppingCartitem removed: {itemToBeRemoved.Id}");
+        _logger.LogInformation($"ShoppingCartitem removed: {itemToBeRemoved.ShoppingCartItemId}");
 
         var removeCount = await _shoppingCartContext.SaveChangesAsync();
 

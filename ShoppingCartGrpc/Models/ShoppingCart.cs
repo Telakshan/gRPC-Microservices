@@ -3,19 +3,18 @@
 public class ShoppingCart
 {
     public int Id { get; set; }
-    public string UserName { get; set; }
-    public List<ShoppingCartItem> Items { get; set; } = new List<ShoppingCartItem>();
+    public string UserName { get; set; } = null!;
+    public virtual List<ShoppingCartItem> ShoppingCartItems { get; set; } = new List<ShoppingCartItem>();
+    public double TotalPrice => ShoppingCartItems.Select(x => x.Price * x.Quantity).Sum();
 
-    public ShoppingCart()
-    {
-    }
+    /*    public ShoppingCart()
+        {
+        }*/
 
-    public ShoppingCart(string userName)
-    {
-        UserName = userName;
-    }
+    /*    public ShoppingCart(string userName)
+        {
+            UserName = userName;
+        }*/
 
-    public float TotalPrice => Items.Select(x => x.Price * x.Quantity).Sum();
-    
 }
 

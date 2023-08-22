@@ -2,6 +2,7 @@ using Grpc.Core;
 using Grpc.Net.Client;
 using ProductGrpc.Protos;
 using ShoppingCartGrpc.Protos;
+using System.Runtime.InteropServices;
 
 namespace ShoppingCartWorkerService;
 
@@ -73,6 +74,8 @@ public class Worker : BackgroundService
 
             //Close the stream
             await scClientStream.RequestStream.CompleteAsync();
+
+            _logger.LogInformation("ShoppingCart total: {totalPrice}", shoppingCartModel.TotalPrice);
 
             //var addItemIntoShoppingCartResponse = await scClientStream;
 
