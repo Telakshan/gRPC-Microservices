@@ -1,5 +1,6 @@
 using Grpc.Core;
 using Grpc.Net.Client;
+using IdentityModel.Client;
 using ProductGrpc.Protos;
 using ShoppingCartGrpc.Protos;
 
@@ -27,6 +28,8 @@ public class Worker : BackgroundService
             using var shoppingCartChannel = GrpcChannel
                 .ForAddress(_configuration.GetValue<string>("WorkerService:ShoppingCartServerUrl") ?? throw new ArgumentNullException("ShoppingCartServerUrl Not found!"));
 
+            var token = await GetTokenFromIS4();
+            
             var shoppingCartClient = new ShoppingCartProtoService.ShoppingCartProtoServiceClient(shoppingCartChannel);
 
             //Get or create a shopping cart
@@ -80,6 +83,35 @@ public class Worker : BackgroundService
 
             await Task.Delay(_configuration.GetValue<int>("WorkerService:TaskInterval"), stoppingToken);
         }
+    }
+
+    private async Task<string> GetTokenFromIS4()
+    {
+        var client = new HttpClient();
+        var discoveryDocument = await client.GetDiscoveryDocumentAsync(_configuration.GetValue<string>("WorkerService:IdentityServerUrl"));
+
+        if(discoveryDocument.IsError)
+        {
+            _logger.LogError(discoveryDocument.Error);
+            return string.Empty;
+        }
+
+        var tokenResponse = await client.RequestClientCredentialsTokenAsync
+            (new ClientCredentialsTokenRequest 
+            { 
+                Address = discoveryDocument.TokenEndpoint,
+                ClientId = "ShoppingCartClient",
+                ClientSecret = _configuration.GetValue<string>("WorkerService:ClientSecret"),
+                Scope = "ShoppingCartAPI"
+            });
+
+        if (tokenResponse.IsError)
+        {
+            _logger.LogError(tokenResponse.Error);
+            return string.Empty;
+        }
+
+        return tokenResponse.AccessToken ?? throw new ArgumentNullException();
     }
 
     public async Task<ShoppingCartModel> GetOrCreateShoppingCart(ShoppingCartProtoService.ShoppingCartProtoServiceClient shoppingCartClient)
