@@ -33,7 +33,7 @@ public class Worker : BackgroundService
             var shoppingCartClient = new ShoppingCartProtoService.ShoppingCartProtoServiceClient(shoppingCartChannel);
 
             //Get or create a shopping cart
-            var shoppingCartModel = await GetOrCreateShoppingCart(shoppingCartClient);
+            var shoppingCartModel = await GetOrCreateShoppingCart(shoppingCartClient, token);
 
            //Open client stream
             using var scClientStream = shoppingCartClient.AddItemIntoShoppingCart();
@@ -114,7 +114,7 @@ public class Worker : BackgroundService
         return tokenResponse.AccessToken ?? throw new ArgumentNullException();
     }
 
-    public async Task<ShoppingCartModel> GetOrCreateShoppingCart(ShoppingCartProtoService.ShoppingCartProtoServiceClient shoppingCartClient)
+    public async Task<ShoppingCartModel> GetOrCreateShoppingCart(ShoppingCartProtoService.ShoppingCartProtoServiceClient shoppingCartClient, string token)
     {
         ShoppingCartModel shoppingCartModel;
 
@@ -122,7 +122,12 @@ public class Worker : BackgroundService
         {
             _logger.LogInformation("GetShoppingCartAsync started");
 
-            shoppingCartModel = await shoppingCartClient.GetShoppingCartAsync(new GetShoppingCartRequest { Username = _configuration.GetValue<string>("WorkerService:UserName") });
+            var headers = new Metadata
+            {
+                { "Authorization", $"Bearer {token}" }
+            };
+
+            shoppingCartModel = await shoppingCartClient.GetShoppingCartAsync(new GetShoppingCartRequest { Username = _configuration.GetValue<string>("WorkerService:UserName") }, headers);
             
             _logger.LogInformation("GetShoppingCartAsync Response: {shoppingCartModel}", shoppingCartModel);
         }
