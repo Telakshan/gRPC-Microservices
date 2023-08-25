@@ -1,5 +1,6 @@
 using Grpc.Core;
 using Grpc.Net.Client;
+using IdentityModel.Client;
 using ProductGrpc.Protos;
 using ShoppingCartGrpc.Protos;
 
@@ -27,10 +28,12 @@ public class Worker : BackgroundService
             using var shoppingCartChannel = GrpcChannel
                 .ForAddress(_configuration.GetValue<string>("WorkerService:ShoppingCartServerUrl") ?? throw new ArgumentNullException("ShoppingCartServerUrl Not found!"));
 
+            var token = await GetTokenFromIS4();
+            
             var shoppingCartClient = new ShoppingCartProtoService.ShoppingCartProtoServiceClient(shoppingCartChannel);
 
             //Get or create a shopping cart
-            var shoppingCartModel = await GetOrCreateShoppingCart(shoppingCartClient);
+            var shoppingCartModel = await GetOrCreateShoppingCart(shoppingCartClient, token);
 
            //Open client stream
             using var scClientStream = shoppingCartClient.AddItemIntoShoppingCart();
@@ -82,7 +85,36 @@ public class Worker : BackgroundService
         }
     }
 
-    public async Task<ShoppingCartModel> GetOrCreateShoppingCart(ShoppingCartProtoService.ShoppingCartProtoServiceClient shoppingCartClient)
+    private async Task<string> GetTokenFromIS4()
+    {
+        var client = new HttpClient();
+        var discoveryDocument = await client.GetDiscoveryDocumentAsync(_configuration.GetValue<string>("WorkerService:IdentityServerUrl"));
+
+        if(discoveryDocument.IsError)
+        {
+            _logger.LogError(discoveryDocument.Error);
+            return string.Empty;
+        }
+
+        var tokenResponse = await client.RequestClientCredentialsTokenAsync
+            (new ClientCredentialsTokenRequest 
+            { 
+                Address = discoveryDocument.TokenEndpoint,
+                ClientId = "ShoppingCartClient",
+                ClientSecret = _configuration.GetValue<string>("WorkerService:ClientSecret"),
+                Scope = "ShoppingCartAPI"
+            });
+
+        if (tokenResponse.IsError)
+        {
+            _logger.LogError(tokenResponse.Error);
+            return string.Empty;
+        }
+
+        return tokenResponse.AccessToken ?? throw new ArgumentNullException();
+    }
+
+    public async Task<ShoppingCartModel> GetOrCreateShoppingCart(ShoppingCartProtoService.ShoppingCartProtoServiceClient shoppingCartClient, string token)
     {
         ShoppingCartModel shoppingCartModel;
 
@@ -90,7 +122,12 @@ public class Worker : BackgroundService
         {
             _logger.LogInformation("GetShoppingCartAsync started");
 
-            shoppingCartModel = await shoppingCartClient.GetShoppingCartAsync(new GetShoppingCartRequest { Username = _configuration.GetValue<string>("WorkerService:UserName") });
+            var headers = new Metadata
+            {
+                { "Authorization", $"Bearer {token}" }
+            };
+
+            shoppingCartModel = await shoppingCartClient.GetShoppingCartAsync(new GetShoppingCartRequest { Username = _configuration.GetValue<string>("WorkerService:UserName") }, headers);
             
             _logger.LogInformation("GetShoppingCartAsync Response: {shoppingCartModel}", shoppingCartModel);
         }

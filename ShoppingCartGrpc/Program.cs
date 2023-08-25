@@ -1,10 +1,8 @@
-using ShoppingCartGrpc.Data;
-using Microsoft.EntityFrameworkCore;
-using ShoppingCartGrpc.Services;
 using DiscountGrpc.Protos;
-using static System.Formats.Asn1.AsnWriter;
-using ShoppingCartGrpc.Models;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using ShoppingCartGrpc.Data;
+using ShoppingCartGrpc.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,16 +19,35 @@ builder.Services.AddScoped<DiscountService>();
 builder.Services.AddDbContext<ShoppingCartContext>();
 //builder.Services.AddDbContext<ShoppingCartContext>(options => options.UseInMemoryDatabase("ShoppingCart"));
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer("Bearer", options =>
+    {
+        options.Authority = configuration.GetValue<string>("GrpcConfigs:IdentityServer");
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateAudience = false,
+        };
+    });
+
+builder.Services.AddMvc();
+
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 app.MapGrpcService<ShoppingCartService>();
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
 TruncateTable();
 
 app.Run();
+
+#region Ignore
+//Ignore
 
 async void TruncateTable()
 {
@@ -68,12 +85,12 @@ async void TruncateTable()
 
 void SeedDatabase()
 {
-    using var scope = app.Services.CreateScope();
+    using var scope = app?.Services.CreateScope();
 
     try
     {
-        var scopedContext = scope.ServiceProvider.GetRequiredService<ShoppingCartContext>();
-        Seeder.Initialize(scopedContext);
+        var scopedContext = scope?.ServiceProvider.GetRequiredService<ShoppingCartContext>();
+        Seeder.Initialize(scopedContext ?? throw new ArgumentNullException());
     }
     catch
     {
@@ -90,6 +107,8 @@ public static class Seeder
         context.SaveChanges();
     }
 }
+
+#endregion
 
 //gRPC only works with https protocol
 //ProductServer 7212
