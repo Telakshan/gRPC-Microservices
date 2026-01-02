@@ -1,0 +1,114 @@
+version: '3.4'
+
+networks:
+  grpcnetwork:
+
+services:
+  sqldata:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Password_123
+    ports:
+      - "1433:1433"
+    restart: always
+    networks:
+      - grpcnetwork
+
+  productgrpc:
+    image: productgrpc
+    build:
+      context: .
+      dockerfile: ProductGrpc/Dockerfile
+    ports:
+      - "7212:80"
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=sqldata;Database=ProductsDb;User Id=sa;Password=Password_123;TrustServerCertificate=True;
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+    depends_on:
+      - sqldata
+    restart: always
+    networks:
+      - grpcnetwork
+
+  shoppingcartgrpc:
+    image: shoppingcartgrpc
+    build:
+      context: .
+      dockerfile: ShoppingCartGrpc/Dockerfile
+    ports:
+      - "7093:80"
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=sqldata;Database=ShoppingCartDb;User Id=sa;Password=Password_123;TrustServerCertificate=True;
+      - GrpcConfigs__DiscountUrl=http://discountgrpc:80
+      - GrpcConfigs__IdentityServer=http://identityserver:80
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+    depends_on:
+      - sqldata
+      - discountgrpc
+      - identityserver
+    restart: always
+    networks:
+      - grpcnetwork
+
+  discountgrpc:
+    image: discountgrpc
+    build:
+      context: .
+      dockerfile: DiscountGrpc/Dockerfile
+    ports:
+      - "7169:80"
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=sqldata;Database=DiscountDb;User Id=sa;Password=Password_123;TrustServerCertificate=True;
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+    depends_on:
+      - sqldata
+    restart: always
+    networks:
+      - grpcnetwork
+
+  identityserver:
+    image: identityserver
+    build:
+      context: .
+      dockerfile: IdentityServer/Dockerfile
+    ports:
+      - "5005:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+    restart: always
+    networks:
+      - grpcnetwork
+
+  productworkerservice:
+    image: productworkerservice
+    build:
+      context: .
+      dockerfile: ProductWorkerService/Dockerfile
+    environment:
+      - WorkerService__ServerUrl=http://productgrpc:80
+    depends_on:
+      - productgrpc
+    restart: always
+    networks:
+      - grpcnetwork
+
+  shoppingcartworkerservice:
+    image: shoppingcartworkerservice
+    build:
+      context: .
+      dockerfile: ShoppingCartWorkerService/Dockerfile
+    environment:
+      - WorkerService__ShoppingCartServerUrl=http://shoppingcartgrpc:80
+      - WorkerService__ProductServerUrl=http://productgrpc:80
+      - WorkerService__IdentityServerUrl=http://identityserver
+    depends_on:
+      - shoppingcartgrpc
+      - identityserver
+    restart: always
+    networks:
+      - grpcnetwork

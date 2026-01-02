@@ -7,14 +7,8 @@ public class DiscountContext: DbContext
 {
     public DbSet<Discount> Discount { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    public DiscountContext(DbContextOptions<DiscountContext> options) : base(options)
     {
-
-
-        optionsBuilder.UseSqlServer(
-            "Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = Products"
-            );
-
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

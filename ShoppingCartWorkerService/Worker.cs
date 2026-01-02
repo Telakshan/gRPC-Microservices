@@ -88,7 +88,11 @@ public class Worker : BackgroundService
     private async Task<string> GetTokenFromIS4()
     {
         var client = new HttpClient();
-        var discoveryDocument = await client.GetDiscoveryDocumentAsync(_configuration.GetValue<string>("WorkerService:IdentityServerUrl"));
+        var discoveryDocument = await client.GetDiscoveryDocumentAsync(new DiscoveryDocumentRequest
+        {
+            Address = _configuration.GetValue<string>("WorkerService:IdentityServerUrl"),
+            Policy = { RequireHttps = false, ValidateIssuerName = false }
+        });
 
         if(discoveryDocument.IsError)
         {

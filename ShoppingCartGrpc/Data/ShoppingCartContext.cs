@@ -6,11 +6,8 @@ namespace ShoppingCartGrpc.Data;
 public class ShoppingCartContext : DbContext
 {
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    public ShoppingCartContext(DbContextOptions<ShoppingCartContext> options) : base(options)
     {
-        optionsBuilder.UseSqlServer(
-            "Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = Products"
-        );
     }
 
     public DbSet<ShoppingCart> ShoppingCart { get; set; }

@@ -16,16 +16,19 @@ IConfiguration configuration = builder.Configuration;
 builder.Services.AddGrpc();
 builder.Services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>(o => o.Address = new Uri(configuration.GetValue<string>("GrpcConfigs:DiscountUrl")));
 builder.Services.AddScoped<DiscountService>();
-builder.Services.AddDbContext<ShoppingCartContext>();
+builder.Services.AddDbContext<ShoppingCartContext>(options =>
+    options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 //builder.Services.AddDbContext<ShoppingCartContext>(options => options.UseInMemoryDatabase("ShoppingCart"));
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>
     {
         options.Authority = configuration.GetValue<string>("GrpcConfigs:IdentityServer");
+        options.RequireHttpsMetadata = false;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateAudience = false,
+            ValidateIssuer = false,
         };
     });
 
@@ -34,6 +37,14 @@ builder.Services.AddMvc();
 builder.Services.AddHealthChecks();
 
 var app = builder.Build();
+
+// Apply Migrations
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<ShoppingCartContext>();
+    context.Database.Migrate();
+}
 
 // Configure the HTTP request pipeline.
 app.MapGrpcService<ShoppingCartService>();

@@ -1,5 +1,6 @@
 using DiscountGrpc.Data;
 using DiscountGrpc.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,10 +9,19 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddGrpc();
-builder.Services.AddDbContext<DiscountContext>();
+builder.Services.AddDbContext<DiscountContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
+
+// Apply Migrations
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<DiscountContext>();
+    context.Database.Migrate();
+}
 
 // Configure the HTTP request pipeline.
 app.MapGrpcService<DiscountService>();

@@ -7,10 +7,19 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddGrpc(opt => opt.EnableDetailedErrors = true);
 //builder.Services.AddDbContext<ProductsContext>(options => options.UseInMemoryDatabase("Products"));
-builder.Services.AddDbContext<ProductsContext>();
+builder.Services.AddDbContext<ProductsContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
+
+// Apply Migrations
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<ProductsContext>();
+    context.Database.Migrate();
+}
 
 // Configure the HTTP request pipeline.
 app.MapGrpcService<ProductService>();

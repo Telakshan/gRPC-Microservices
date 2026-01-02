@@ -9,14 +9,8 @@ public class ProductsContext: DbContext
 {
     public DbSet<Product> Products { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    public ProductsContext(DbContextOptions<ProductsContext> options) : base(options)
     {
-
-
-        optionsBuilder.UseSqlServer(
-            "Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = Products"
-            );
-            //.LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, Microsoft.Extensions.Logging.LogLevel.Information);//.EnableSensitiveDataLogging();
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
