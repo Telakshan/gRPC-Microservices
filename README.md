@@ -12,3 +12,5 @@ Services: Define the RPC methods available for clients to call.
 ### To migrate database, individually cd in to ProductGrpc, DiscountGrpc, ShoppingCartGrpc and please run:
 
 dotnet ef database update
+
+### Whole repo is now dockerized, please run docker compose up -d
